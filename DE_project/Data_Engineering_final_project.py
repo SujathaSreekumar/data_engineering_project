@@ -605,3 +605,14 @@ query_4 = spark.sql('''
                     ''')
 query_4.write.mode('overwrite').saveAsTable('query_4')
 
+
+# COMMAND ----------
+
+# MAGIC %sql 
+# MAGIC select *
+# MAGIC from default.sg_listing
+# MAGIC where host_name like 'Bryce%'
+
+# COMMAND ----------
+
+
