@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC ## Data Analysis of Airbnb data
+# MAGIC ## Data Analysis of Airbnb data - Singapore
 
 # COMMAND ----------
 
@@ -15,6 +15,9 @@
 
 # MAGIC %md
 # MAGIC This notebook is for data analysis of Airbnb data.
+# MAGIC
+# MAGIC Data is taken from http://insideairbnb.com/get-the-data<br><br>
+# MAGIC The country chosen for the Airbnb data is Singapore
 
 # COMMAND ----------
 
@@ -242,10 +245,6 @@ df_cal_4.printSchema()
 
 # COMMAND ----------
 
-df_cal_4.printSchema
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC ### Data Transformation
 
@@ -278,7 +277,7 @@ df_listing_full.count()
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ###### Lets check for duplicates and if any we will remove the duplicate rows
+# MAGIC ###### Lets check for duplicates and if any, we will remove the duplicate rows
 
 # COMMAND ----------
 
@@ -300,7 +299,7 @@ df_listing_full.count()
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ###### Final table for listing has 13312 rows of data
+# MAGIC ###### Table for listing has 13312 rows of data
 
 # COMMAND ----------
 
@@ -353,12 +352,12 @@ df_calender_full.count()
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ###### Final table for calender has 3902795(3.9M) rows of data
+# MAGIC ###### Table for calender has 3902795(3.9M) rows of data
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ###### Checking for null values
+# MAGIC ##### Checking for null values
 
 # COMMAND ----------
 
@@ -382,4 +381,169 @@ df2.show()
 
 # COMMAND ----------
 
+df_listing_full.write.mode('overwrite').saveAsTable('sg_listing')
+df_calender_full.write.mode('overwrite').saveAsTable('sg_calender')
 
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC - ##### Listing table 
+# MAGIC ###### Removing null values 
+# MAGIC ###### Filtering out extreme values for a clean data
+
+# COMMAND ----------
+
+df_listing_full = df_listing_full.dropna(subset=['id','neighbourhood_group','neighbourhood','room_type','price'])
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT name,host_name,price,neighbourhood_group,neighbourhood,room_type,minimum_nights 
+# MAGIC FROM default.sg_listing
+# MAGIC where price in (
+# MAGIC SELECT max(price) AS max_price
+# MAGIC FROM default.sg_listing)
+
+# COMMAND ----------
+
+df_listing_full = df_listing_full.filter(col('price').between(10,10000))
+
+# COMMAND ----------
+
+df_listing_full.count()
+
+# COMMAND ----------
+
+df = df_listing_full.select([count(when(col(c).contains('None') | \
+                            col(c).contains('NULL') | \
+                            (col(c) == '' ) | \
+                            col(c).isNull(), c 
+                           )).alias(c)
+                    for c in df_listing_full.columns])
+df.show()
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT * 
+# MAGIC FROM default.sg_listing
+# MAGIC where price in (100,200,300,400,500)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC - ##### Calender table 
+# MAGIC ###### Removing null values 
+# MAGIC ###### Filtering out extreme values for a clean data
+
+# COMMAND ----------
+
+df_calender_full = df_calender_full.dropna(subset=['price','adjusted_price'])
+
+# COMMAND ----------
+
+df2 = df_calender_full.select([count(when(col(c).contains('None') | \
+                            col(c).contains('NULL') | \
+                            (col(c) == '' ) | \
+                            col(c).isNull(), c 
+                           )).alias(c)
+                    for c in df_calender_full.columns])
+df2.show()
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Exporting the clean data for analysis
+
+# COMMAND ----------
+
+df_listing_full.write.mode('overwrite').saveAsTable('sg_listing')
+df_calender_full.write.mode('overwrite').saveAsTable('sg_calender')
+
+# COMMAND ----------
+
+# MAGIC %md 
+# MAGIC - ##### What are the various types of rooms available? Which room type is popular?
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT room_type,COUNT(room_type) AS total_count
+# MAGIC FROM default.sg_listing
+# MAGIC GROUP BY room_type
+# MAGIC ORDER BY total_count DESC;
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Entire home/apartments is the popular choice of accommodation with 6942 listings and is closely followed by Private Rooms with 5396 listings
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC - ##### Which neighbourhood is the preferred choice of accomodation? Why is it so?
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT neighbourhood_group, COUNT(id) as total_count
+# MAGIC FROM default.sg_listing
+# MAGIC GROUP BY neighbourhood_group
+# MAGIC ORDER BY total_count DESC;
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Central Region emerges the clear winner here with a total count of 9372 listings in the area.<br>
+# MAGIC This could be due to the proximity to the city centre.<br>
+# MAGIC Moreover in Singapore, Airbnb doesn't cater to normal tourists as it is illegal, but they are legal to be rent out with a minimum rental period of 3 months<br>
+# MAGIC Since Central Region is the preferred area of choice, it most likely seems to be catering to business employees who are here for short-term work commitments.
+# MAGIC  
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT neighbourhood, COUNT(id) as total_count
+# MAGIC FROM default.sg_listing
+# MAGIC WHERE neighbourhood_group = 'Central Region'
+# MAGIC GROUP BY neighbourhood
+# MAGIC ORDER BY total_count DESC;
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Top three areas(Kallang, Downtown Core, Outram) together comprises of 1/3 of the listings<br>
+# MAGIC Top five areas(Kallang, Downtown Core, Outram,Rochor,Queenstown) together comprises 1/2 of the listings
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC - ##### Find out any listing of 'Rooftop' and 'near MRT' which are available
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT DISTINCT cal.listing_id,cal.available,lis.name, lis.neighbourhood_group,lis.neighbourhood,cal.price
+# MAGIC FROM default.sg_calender cal
+# MAGIC JOIN default.sg_listing lis
+# MAGIC ON cal.listing_id = lis.id
+# MAGIC WHERE lis.name LIKE '%Rooftop% near MRT%' and cal.available = 't';
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC We can see one listing 'Rooftop deck serviced studio in CBD near MRT' in the Central Region.<br>The price varies from $200 - $203  
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC - ##### Find out any listing of 'pool' and 'near MRT' which are available.<br>List the dates of availability
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT DISTINCT cal.listing_id,cal.`date`,cal.available,lis.name, lis.neighbourhood_group,lis.neighbourhood,cal.price
+# MAGIC FROM default.sg_calender cal
+# MAGIC JOIN default.sg_listing lis
+# MAGIC ON cal.listing_id = lis.id
+# MAGIC WHERE lis.name LIKE '%pool%near MRT%' and cal.available = 't';
