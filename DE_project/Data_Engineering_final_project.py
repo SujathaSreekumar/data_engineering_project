@@ -475,6 +475,17 @@ df_calender_full.write.mode('overwrite').saveAsTable('sg_calender')
 
 # COMMAND ----------
 
+query_1 = spark.sql('''
+                    SELECT room_type,COUNT(room_type) AS total_count
+                    FROM default.sg_listing
+                    GROUP BY room_type
+                    ORDER BY total_count DESC;                    
+                    ''')
+query_1.write.mode('overwrite').saveAsTable('query_1')
+
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC Entire home/apartments is the popular choice of accommodation with 6942 listings and is closely followed by Private Rooms with 5396 listings
 
@@ -493,6 +504,17 @@ df_calender_full.write.mode('overwrite').saveAsTable('sg_calender')
 
 # COMMAND ----------
 
+query_2a = spark.sql('''
+                    SELECT neighbourhood_group, COUNT(id) as total_count
+                    FROM default.sg_listing
+                    GROUP BY neighbourhood_group
+                    ORDER BY total_count DESC;                    
+                    ''')
+query_2a.write.mode('overwrite').saveAsTable('query_2a')
+
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC Central Region emerges the clear winner here with a total count of 9372 listings in the area.<br>
 # MAGIC This could be due to the proximity to the city centre.<br>
@@ -508,6 +530,18 @@ df_calender_full.write.mode('overwrite').saveAsTable('sg_calender')
 # MAGIC WHERE neighbourhood_group = 'Central Region'
 # MAGIC GROUP BY neighbourhood
 # MAGIC ORDER BY total_count DESC;
+
+# COMMAND ----------
+
+query_2b = spark.sql('''
+                     SELECT neighbourhood, COUNT(id) as total_count
+                     FROM default.sg_listing
+                     WHERE neighbourhood_group = 'Central Region'
+                     GROUP BY neighbourhood
+                     ORDER BY total_count DESC;
+                     ''')
+query_2b.write.mode('overwrite').saveAsTable('query_2b')
+
 
 # COMMAND ----------
 
@@ -531,6 +565,18 @@ df_calender_full.write.mode('overwrite').saveAsTable('sg_calender')
 
 # COMMAND ----------
 
+query_3 = spark.sql('''
+                    SELECT DISTINCT cal.listing_id,cal.available,lis.name, lis.neighbourhood_group,lis.neighbourhood,cal.price
+                    FROM default.sg_calender cal
+                    JOIN default.sg_listing lis
+                    ON cal.listing_id = lis.id
+                    WHERE lis.name LIKE '%Rooftop% near MRT%' and cal.available = 't';                    
+                    ''')
+query_3.write.mode('overwrite').saveAsTable('query_3')
+
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC We can see one listing 'Rooftop deck serviced studio in CBD near MRT' in the Central Region.<br>The price varies from $200 - $203  
 
@@ -547,3 +593,15 @@ df_calender_full.write.mode('overwrite').saveAsTable('sg_calender')
 # MAGIC JOIN default.sg_listing lis
 # MAGIC ON cal.listing_id = lis.id
 # MAGIC WHERE lis.name LIKE '%pool%near MRT%' and cal.available = 't';
+
+# COMMAND ----------
+
+query_4 = spark.sql('''
+                    SELECT DISTINCT cal.listing_id,cal.`date`,cal.available,lis.name, lis.neighbourhood_group,lis.neighbourhood,cal.price
+                    FROM default.sg_calender cal
+                    JOIN default.sg_listing lis
+                    ON cal.listing_id = lis.id
+                    WHERE lis.name LIKE '%pool%near MRT%' and cal.available = 't';                    
+                    ''')
+query_4.write.mode('overwrite').saveAsTable('query_4')
+
