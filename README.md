@@ -1,5 +1,6 @@
 # data_engineering_project
 # Data Analysis of Airbnb data - Singapore
+### Problem Statement : Analyzing the Airbnb data to gain insights on the trends and patterns of short-term house-rentals and how it impacts the hospitality sector in Singapore.
 
 ### Data : http://insideairbnb.com/get-the-data
 ### Tools Used : Azure Databricks, PowerBI
@@ -7,11 +8,13 @@
 
 ## Insights
 
-![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/fdf4edb5-5663-4395-8367-04e4b15862e9)
-![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/a37ef4be-8de0-402f-9c88-f8d4a8246b4f)
-![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/58f010df-d784-4678-9676-104c1cf38b2b)
-![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/61045a60-b127-47fb-89c0-00f5ce58945f)
-![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/70752722-f752-42e7-803f-05bafa669ef7)
-![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/9f3a1aad-5ab9-4031-8273-ae20057d5ca0)
-![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/ccc82bf8-fec0-44b9-857d-a6e07e035846)
+![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/fcf69788-c6c8-422b-9d61-efb72e21f7d5)
+![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/f51e2eab-40d2-48ad-a2e7-9f589e781936)
+![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/beac7037-d775-444e-866c-3e3214d8a638)
+![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/a56cb1b7-8d76-451d-bc3b-9395971c174f)
+![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/42b1b24e-40a0-4e7d-afe2-b654edb3f01b)
+![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/c6d4858f-352b-4faf-8078-3fb33286db3a)
+![image](https://github.com/SujathaSreekumar/data_engineering_project/assets/57211443/640f95e5-9afd-432c-b53a-7b156cb96844)
 
+
+Thank You!
